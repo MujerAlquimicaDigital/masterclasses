@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Mapa de la Estructura — Mujer Alquímica Digital</title>
+  <link rel="icon" href="assets/icono.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    @font-face {
+      font-family: 'Michelia';
+      src: url('assets/Michelia.otf') format('opentype');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+
+    :root {
+      --verde:        #97a585;
+      --verde-dark:   #6b7a5a;
+      --azul:         #263549;
+      --azul-dark:    #1a2535;
+      --azul-mid:     #1e2d40;
+      --terracota:    #9e5038;
+      --terra-light:  #c8705a;
+      --dorado:       #d4b87e;
+      --dorado-claro: #f7d795;
+      --dorado-osc:   #a18348;
+      --crema:        #e9ddc3;
+      --crema-dim:    rgba(233,221,195,0.75);
+      --blanco:       #fdfaf5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--azul-dark);
+      font-family: 'Raleway', sans-serif;
+      color: var(--crema);
+      user-select: none;
+    }
+
+    #presentation { position: relative; width: 100%; height: 100%; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 56px 80px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── REVEAL: requires click — solo fade, sin translateY ── */
+    .r { opacity: 0; transition: opacity 0.4s ease; }
+    .r.show { opacity: 1; }
+
+    /* ── REVEAL: auto on slide enter (title/label/divider) — slides down from above ── */
+    .ra { opacity: 0; transform: translateY(-12px); transition: opacity 0.45s ease, transform 0.45s ease; }
+    .ra.show { opacity: 1; transform: translateY(0); }
+
+    /* ── FIXED UI ── */
+    #logo { position: fixed; top: 22px; left: 28px; z-index: 200; opacity: 0.45; }
+    #logo img { width: 26px; height: auto; }
+
+    #counter {
+      position: fixed; top: 24px; right: 32px;
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.12em; color: rgba(212,184,126,0.38); z-index: 200;
+    }
+
+    #progress {
+      position: fixed; bottom: 26px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 200;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(212,184,126,0.28); cursor: pointer; transition: background 0.3s, transform 0.3s; }
+    .dot.on { background: var(--dorado); transform: scale(1.45); }
+
+    .nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(212,184,126,0.08);
+      border: 1px solid rgba(212,184,126,0.18);
+      color: var(--dorado); font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 200; transition: background 0.2s;
+    }
+    .nav:hover { background: rgba(212,184,126,0.16); }
+    #prev { left: 18px; }
+    #next { right: 18px; }
+
+    /* ── TYPOGRAPHY ── */
+    .label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--dorado); margin-bottom: 14px; }
+    .h-display { font-family: 'Michelia', Georgia, serif; font-weight: normal; line-height: 1.1; }
+    .h1 { font-size: clamp(3rem, 7vw, 6.5rem); color: var(--crema); text-align: center; }
+    .h1 em { color: var(--dorado-claro); font-style: normal; }
+    .h2 { font-size: clamp(1.9rem, 4vw, 3.4rem); color: var(--dorado-claro); text-align: center; margin-bottom: 10px; }
+    .h2 em { color: var(--verde); font-style: normal; }
+    .h2 em.terra { color: var(--terra-light); font-style: normal; }
+
+    .subtitle { font-size: clamp(0.92rem, 1.7vw, 1.18rem); font-weight: 300; line-height: 1.72; color: var(--crema-dim); text-align: center; max-width: 700px; }
+    .divider { width: 52px; height: 1px; background: var(--dorado); opacity: 0.5; margin: 16px auto 20px; }
+
+    /* ── POINTS LIST ── */
+    .points { list-style: none; display: flex; flex-direction: column; gap: 13px; max-width: 700px; margin: 0 auto; text-align: left; }
+    .points li { display: flex; align-items: flex-start; gap: 13px; font-size: clamp(0.88rem, 1.5vw, 1.05rem); line-height: 1.6; color: rgba(233,221,195,0.9); }
+    .bul { width: 6px; height: 6px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; margin-top: 7px; }
+    .bul.t { background: var(--terra-light); }
+    .bul.v { background: var(--verde); }
+
+    /* ── ORB ── */
+    .orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(90px); }
+
+    /* ══ PORTADA ══ */
+    #s1 { background: var(--azul-dark); }
+    #s1 .orb1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(158,80,56,0.2) 0%, transparent 68%); top: -180px; right: -80px; }
+    #s1 .orb2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(212,184,126,0.12) 0%, transparent 68%); bottom: -140px; left: -120px; }
+    #s1 .inner { position: relative; z-index: 2; text-align: center; }
+    #s1 .pill { display: inline-flex; align-items: center; gap: 10px; background: rgba(212,184,126,0.08); border: 1px solid rgba(212,184,126,0.22); border-radius: 100px; padding: 7px 22px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dorado); margin-bottom: 30px; }
+    #s1 .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); opacity: 0.6; }
+    #s1 .s1-icon { width: 52px; height: auto; display: block; margin: 0 auto 22px; opacity: 0.95; }
+
+    /* ══ PILL genérico (dividers de parte) ══ */
+    .pill { display: inline-flex; align-items: center; gap: 10px; background: rgba(212,184,126,0.08); border: 1px solid rgba(212,184,126,0.22); border-radius: 100px; padding: 7px 22px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dorado); margin-bottom: 30px; }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); opacity: 0.6; }
+
+    /* ══ ÍNDICE ══ */
+    .index-list { list-style: none; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 620px; margin-top: 8px; }
+    .index-item { display: flex; align-items: baseline; gap: 20px; }
+    .index-num { font-family: 'Michelia', serif; font-size: 1.5rem; color: var(--dorado); opacity: 0.5; width: 34px; text-align: right; flex-shrink: 0; }
+    .index-title { font-family: 'Michelia', serif; font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--crema); }
+    .index-title small { display: block; font-family: 'Raleway', sans-serif; font-size: 0.72rem; font-weight: 300; letter-spacing: 0.04em; color: var(--crema-dim); margin-top: 3px; }
+
+    /* ══ TRIÁNGULO Problema · Solución · Resultado ══ */
+    .triangle-wrap { position: relative; width: min(92vw, 580px); height: 380px; margin: 26px auto 0; }
+    .tri-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .tri-node { position: absolute; width: 200px; padding: 18px 18px; border-radius: 14px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.28); }
+    .tri-node.top { top: 0; left: 50%; transform: translateX(-50%); }
+    .tri-node.left { bottom: 0; left: 0; }
+    .tri-node.right { bottom: 0; right: 0; }
+    .tri-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dorado); opacity: 0.75; margin-bottom: 6px; }
+    .tri-word { font-family: 'Michelia', serif; font-size: 1.35rem; color: var(--dorado-claro); margin-bottom: 6px; }
+    .tri-desc { font-size: 0.74rem; line-height: 1.45; color: rgba(233,221,195,0.7); }
+
+    /* ══ % CONTENIDO (Autoridad / Educación / Venta) ══ */
+    .pct-row { display: flex; gap: 20px; width: 100%; max-width: 920px; margin-top: 24px; flex-wrap: wrap; justify-content: center; }
+    .pct-card { flex: 1 1 240px; max-width: 280px; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.18); border-radius: 16px; padding: 26px 22px; text-align: center; }
+    .pct-num { font-family: 'Michelia', serif; font-size: 2.4rem; color: var(--dorado-claro); line-height: 1; }
+    .pct-bar-track { width: 100%; height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); margin: 14px 0 14px; overflow: hidden; }
+    .pct-bar-fill { height: 100%; border-radius: 4px; background: var(--dorado); }
+    .pct-title { font-family: 'Michelia', serif; font-size: 1.1rem; color: var(--crema); margin-bottom: 6px; }
+    .pct-desc { font-size: 0.78rem; opacity: 0.7; line-height: 1.5; color: rgba(233,221,195,0.85); }
+
+    /* ══ IMAGE SLOTS (placeholders de referencia) ══ */
+    .img-slots { display: flex; gap: 18px; width: 100%; max-width: 960px; margin-top: 24px; }
+    .img-slot { flex: 1; min-width: 0; aspect-ratio: 4 / 5; border: 1.5px dashed rgba(212,184,126,0.35); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.02); }
+    .img-slot .slot-icon { font-size: 1.5rem; opacity: 0.5; }
+    .img-slot .slot-text { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; text-align: center; padding: 0 12px; }
+    .img-slot.filled { border-style: solid; border-color: rgba(212,184,126,0.3); padding: 0; overflow: hidden; }
+    .img-slot.filled img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ══ VIDEO DE EJEMPLO (vertical, tipo reel) ══ */
+    .example-video { flex: 1; min-width: 0; aspect-ratio: 9 / 16; max-height: 380px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(212,184,126,0.3); background: #000; margin: 0 auto; }
+    .example-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ══ MINI CARRUSEL (carrusel de ejemplo) ══ */
+    .mini-carousel { flex: 1; min-width: 0; aspect-ratio: 4 / 5; max-height: 380px; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid rgba(212,184,126,0.3); background: #000; margin: 0 auto; }
+    .mini-carousel img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; inset: 0; opacity: 0; transition: opacity 0.35s ease; }
+    .mini-carousel img.mc-active { opacity: 1; }
+    .mc-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.5); color: var(--dorado-claro); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; z-index: 5; user-select: none; }
+    .mc-prev { left: 6px; } .mc-next { right: 6px; }
+    .mc-count { position: absolute; bottom: 8px; right: 10px; font-size: 0.6rem; letter-spacing: 0.05em; color: var(--dorado-claro); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 20px; z-index: 5; }
+    .slot-caption { text-align: center; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dorado); opacity: 0.7; margin-top: 10px; }
+    .slots-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: stretch; }
+
+    /* ══ FÓRMULA (Claridad + Autoridad + Confianza = Venta) ══ */
+    .formula-row { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 30px; max-width: 960px; }
+    .f-pill { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.22); border-radius: 100px; padding: 16px 26px; font-family: 'Michelia', serif; font-size: clamp(0.95rem, 1.8vw, 1.15rem); color: var(--crema); text-align: center; }
+    .f-pill.result { background: rgba(212,184,126,0.12); border-color: var(--dorado); color: var(--dorado-claro); font-size: clamp(1.05rem, 2vw, 1.3rem); }
+    .f-op { font-size: 1.5rem; color: var(--dorado); opacity: 0.6; font-family: 'Michelia', serif; }
+
+    /* ══ QUOTE / TESTIMONIO ══ */
+    .quote-block { border-left: 3px solid var(--dorado); padding: 14px 22px; background: rgba(212,184,126,0.05); border-radius: 0 12px 12px 0; text-align: left; margin-top: 22px; max-width: 700px; }
+    .quote-block p { font-family: 'Michelia', serif; font-size: clamp(0.9rem, 1.7vw, 1.2rem); font-style: italic; line-height: 1.55; color: var(--crema); }
+    .quote-block span { display: block; margin-top: 8px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dorado); }
+
+    /* ══ ACTIVACIÓN / EJERCICIO (círculo) ══ */
+    .act-circle {
+      width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(212,184,126,0.22);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 36px; position: relative; margin-top: 28px;
+    }
+    .act-circle::before { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1px solid rgba(212,184,126,0.1); }
+    .act-circle::after  { content: ''; position: absolute; inset: -28px; border-radius: 50%; border: 1px solid rgba(212,184,126,0.05); }
+    .act-tag { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dorado); opacity: 0.65; margin-bottom: 10px; }
+    .act-title { font-family: 'Michelia', serif; font-size: clamp(1.3rem, 2.4vw, 1.85rem); font-weight: normal; line-height: 1.28; color: var(--crema); }
+    .act-title em { color: var(--dorado-claro); font-style: normal; }
+    .act-by { font-size: 0.78rem; margin-top: 12px; color: var(--crema); opacity: 0.45; letter-spacing: 0.06em; max-width: 320px; }
+
+    /* ══ DIVIDER DE PARTE (fondo con orb) ══ */
+    .part-divider { background: radial-gradient(ellipse at center, rgba(158,80,56,0.16) 0%, var(--azul-dark) 62%); }
+  </style>
+</head>
+<body>
+
+<div id="presentation">
+
+  <!-- ══════ S1 · PORTADA ══════ -->
+  <div class="slide active" id="s1" data-idx="0">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="inner">
+      <img src="assets/icono.png" alt="Mujer Alquímica Digital" class="s1-icon" />
+      <div class="label" style="margin-bottom:22px;">Masterclass</div>
+      <h1 class="h-display h1">El Mapa<br /><em>de la Estructura</em></h1>
+      <div class="divider" style="opacity:0.45;"></div>
+      <p class="subtitle" style="max-width:640px;">
+        Descubre las cinco piezas que debes ordenar en tus redes sociales para que la venta sea consecuencia natural de tu negocio.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ S2 · ÍNDICE ══════ -->
+  <div class="slide" id="s2" data-idx="1">
+    <div class="label ra">Lo que vamos a recorrer hoy</div>
+    <h2 class="h-display h2 ra">Cinco piezas,<br/><em>un solo mapa</em></h2>
+    <div class="divider ra"></div>
+    <ul class="index-list">
+      <li class="index-item r"><span class="index-num">01</span><span class="index-title">La Revelación<small>Qué pasa cuando tu mensaje no está claro</small></span></li>
+      <li class="index-item r"><span class="index-num">02</span><span class="index-title">Piezas Básicas<small>La tríada de comunicación</small></span></li>
+      <li class="index-item r"><span class="index-num">03</span><span class="index-title">Contenido con Intención<small>Autoridad, educación y venta</small></span></li>
+      <li class="index-item r"><span class="index-num">04</span><span class="index-title">Constancia Sostenible<small>Alineada a tus ciclos, no a la fórmula de afuera</small></span></li>
+      <li class="index-item r"><span class="index-num">05</span><span class="index-title">La Consecuencia Natural<small>El camino que recorre tu cliente</small></span></li>
+    </ul>
+  </div>
+
+  <!-- ══════ S3 · DIVIDER PARTE 1 ══════ -->
+  <div class="slide part-divider" id="s3" data-idx="2">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Parte 1 / 5<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">La Revelación</h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">Qué pasa cuando tu mensaje no está claro</p>
+    </div>
+  </div>
+
+  <!-- ══════ S4 · MENSAJE SIN CLARIDAD ══════ -->
+  <div class="slide" id="s4" data-idx="3">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:800px;">
+      <div class="label ra">El síntoma que todas conocemos</div>
+      <h2 class="h-display h2 ra">Contenido suelto,<br/><em>mensaje ausente</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        Publicas todos los días, pero nada se conecta entre sí. Y quien te ve, se confunde.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Publicas por publicar, sin un hilo que una una pieza con otra</span></li>
+        <li class="r"><span class="bul"></span><span>Tu audiencia no logra entender qué haces ni para quién lo haces</span></li>
+        <li class="r"><span class="bul"></span><span>Cada publicación compite consigo misma en lugar de sumar a una sola historia</span></li>
+        <li class="r"><span class="bul"></span><span>La confusión de quien te ve es un espejo directo de la confusión del mensaje</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S5 · IMÁGENES DE REFERENCIA (PARTE 1) ══════ -->
+  <div class="slide" id="s5" data-idx="4">
+    <div class="label ra">Para ilustrar</div>
+    <h2 class="h-display h2 ra">Así se ve <em>en la vida real</em></h2>
+    <div class="divider ra"></div>
+    <div class="img-slots r">
+      <div class="img-slot filled"><img src="imagenes/grid.png" alt="Ejemplo de contenido suelto" /></div>
+      <div class="img-slot filled"><img src="imagenes/ejemplo-contenido-suelto-2.jpg" alt="Ejemplo de contenido suelto" /></div>
+      <div class="img-slot filled"><img src="imagenes/ejemplo-contenido-suelto-3.jpg" alt="Ejemplo de contenido suelto" /></div>
+    </div>
+  </div>
+
+  <!-- ══════ S6 · ACTIVACIÓN — CUERPO FRAGMENTADO ══════ -->
+  <div class="slide part-divider" id="s6" data-idx="5">
+    <div style="text-align:center;position:relative;z-index:2;">
+      <div class="label r">Para sentirlo antes de entenderlo</div>
+      <div class="act-circle r">
+        <div class="act-tag">Ejercicio somático</div>
+        <div class="act-title">Cómo se siente en el cuerpo<br/><em>la fragmentación</em></div>
+        <div class="act-by">Guiado por Mimi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S7 · DIVIDER PARTE 2 ══════ -->
+  <div class="slide part-divider" id="s7" data-idx="6">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Parte 2 / 5<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">Piezas Básicas</h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">La tríada de comunicación</p>
+    </div>
+  </div>
+
+  <!-- ══════ S8 · EL CLIENTE COMO BASE ══════ -->
+  <div class="slide" id="s8" data-idx="7">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">Antes de la tríada</div>
+      <h2 class="h-display h2 ra">Sin cliente,<br/><em>no hay mensaje</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        Todo mensaje nace de una persona real a la que le hablas. El cliente no es el paso dos — es la base de todo lo que vas a construir.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Tu mensaje solo tiene sentido si existe alguien que lo necesita</span></li>
+        <li class="r"><span class="bul"></span><span>Conocer a tu cliente es lo que le da dirección a cada palabra que publicas</span></li>
+        <li class="r"><span class="bul"></span><span>Sin este cimiento, la tríada de comunicación no tiene dónde sostenerse</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S9 · ACTIVACIÓN — CONECTAR CON EL CLIENTE ══════ -->
+  <div class="slide part-divider" id="s9" data-idx="8">
+    <div style="text-align:center;position:relative;z-index:2;">
+      <div class="label r">Para bajarlo del papel al cuerpo</div>
+      <div class="act-circle r">
+        <div class="act-tag">Ejercicio guiado</div>
+        <div class="act-title">Conectar con<br/><em>tu cliente real</em></div>
+        <div class="act-by">Guiado por Mimi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S10 · TRIÁNGULO PROBLEMA · SOLUCIÓN · RESULTADO ══════ -->
+  <div class="slide" id="s10" data-idx="9">
+    <div class="label ra">La tríada de comunicación</div>
+    <h2 class="h-display h2 ra">Problema · Solución · Resultado</h2>
+    <div class="divider ra"></div>
+    <div class="triangle-wrap r">
+      <svg class="tri-svg" viewBox="0 0 580 380" preserveAspectRatio="none">
+        <line x1="290" y1="95" x2="150" y2="300" stroke="rgba(212,184,126,0.35)" stroke-width="1.5" />
+        <line x1="290" y1="95" x2="430" y2="300" stroke="rgba(212,184,126,0.35)" stroke-width="1.5" />
+        <line x1="200" y1="325" x2="380" y2="325" stroke="rgba(212,184,126,0.35)" stroke-width="1.5" />
+      </svg>
+      <div class="tri-node top">
+        <div class="tri-word">Problema</div>
+        <div class="tri-desc">Lo que tu cliente vive y nombra</div>
+      </div>
+      <div class="tri-node left">
+        <div class="tri-word">Solución</div>
+        <div class="tri-desc">Lo que tú ofreces para resolverlo</div>
+      </div>
+      <div class="tri-node right">
+        <div class="tri-word">Resultado</div>
+        <div class="tri-desc">La transformación que consigue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S11 · DIVIDER PARTE 3 ══════ -->
+  <div class="slide part-divider" id="s11" data-idx="10">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Parte 3 / 5<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">Contenido<br/>con Intención</h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">Primero adentro. Después, afuera.</p>
+    </div>
+  </div>
+
+  <!-- ══════ S12 · MIMI — AUTORIDAD DESDE ADENTRO ══════ -->
+  <div class="slide" id="s12" data-idx="11">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">Antes del contenido — guiado por Mimi</div>
+      <h2 class="h-display h2 ra">La autoridad nace<br/><em>de adentro</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        Desde el sagrado femenino y la energía: por qué la autoridad se genera de adentro hacia afuera.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>La autoridad no se impone desde afuera — se sostiene desde la alineación interna</span></li>
+        <li class="r"><span class="bul"></span><span>Una mujer sostiene su autoridad cuando su energía y su mensaje están en el mismo lugar</span></li>
+        <li class="r"><span class="bul"></span><span>Primero se trabaja adentro. Después, eso se traduce en contenido hacia afuera</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S13 · SIN AUTORIDAD NO HAY VENTA ══════ -->
+  <div class="slide" id="s13" data-idx="12">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">Ya alineada por dentro</div>
+      <h2 class="h-display h2 ra">Sin autoridad,<br/><em>no hay venta</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        Publicar no es para agotarnos. Cada contenido necesita una intención y un propósito claro detrás.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Sin construir autoridad, las personas no llegan a comprarte</span></li>
+        <li class="r"><span class="bul"></span><span>El contenido sin intención solo agota, no construye nada</span></li>
+        <li class="r"><span class="bul"></span><span>Cada publicación debe responder: ¿para qué la estoy haciendo? ¿Y desde dónde lo estoy haciendo?</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S14 · 3 TIPOS DE CONTENIDO (40/40/20) ══════ -->
+  <div class="slide" id="s14" data-idx="13">
+    <div class="label ra">Los tres tipos de contenido</div>
+    <h2 class="h-display h2 ra">Autoridad · Educación · Venta</h2>
+    <div class="divider ra"></div>
+    <p class="subtitle r" style="margin-bottom:8px;">La proporción recomendada para empezar</p>
+    <div class="pct-row r">
+      <div class="pct-card">
+        <div class="pct-num">40%</div>
+        <div class="pct-bar-track"><div class="pct-bar-fill" style="width:40%;"></div></div>
+        <div class="pct-title">Autoridad</div>
+        <div class="pct-desc">Muestra quién eres, tu mirada y tu proceso</div>
+      </div>
+      <div class="pct-card">
+        <div class="pct-num">40%</div>
+        <div class="pct-bar-track"><div class="pct-bar-fill" style="width:40%;"></div></div>
+        <div class="pct-title">Educación</div>
+        <div class="pct-desc">Enseña, aporta valor y claridad real</div>
+      </div>
+      <div class="pct-card">
+        <div class="pct-num">20%</div>
+        <div class="pct-bar-track"><div class="pct-bar-fill" style="width:20%;"></div></div>
+        <div class="pct-title">Venta</div>
+        <div class="pct-desc">Invita a dar el paso hacia tu oferta</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S15 · IMÁGENES DE REFERENCIA (PARTE 3) ══════ -->
+  <div class="slide" id="s15" data-idx="14">
+    <div class="label ra">Para darle claridad</div>
+    <h2 class="h-display h2 ra">Así se ve <em>cada tipo de contenido</em></h2>
+    <div class="divider ra"></div>
+    <div class="img-slots r">
+      <div class="slots-col">
+        <div class="example-video" onclick="event.stopPropagation()">
+          <video src="imagenes/autoridad.mp4" controls playsinline></video>
+        </div>
+        <div class="slot-caption">Autoridad</div>
+      </div>
+      <div class="slots-col">
+        <div class="mini-carousel" id="mc-educacion" onclick="event.stopPropagation()">
+          <img class="mc-active" src="imagenes/educa-1.png" alt="Educación 1" />
+          <img src="imagenes/educa-2.png" alt="Educación 2" />
+          <img src="imagenes/educa-3.png" alt="Educación 3" />
+          <img src="imagenes/educa-4.png" alt="Educación 4" />
+          <img src="imagenes/educa-5.png" alt="Educación 5" />
+          <img src="imagenes/educa-6.png" alt="Educación 6" />
+          <div class="mc-nav mc-prev" onclick="mcStep('mc-educacion',-1)">‹</div>
+          <div class="mc-nav mc-next" onclick="mcStep('mc-educacion',1)">›</div>
+          <div class="mc-count"><span class="mc-cur">1</span>/6</div>
+        </div>
+        <div class="slot-caption">Educación</div>
+      </div>
+      <div class="slots-col">
+        <div class="example-video" onclick="event.stopPropagation()">
+          <video src="imagenes/venta.mp4" controls playsinline></video>
+        </div>
+        <div class="slot-caption">Venta</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S16 · DIVIDER PARTE 4 ══════ -->
+  <div class="slide part-divider" id="s16" data-idx="15">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Parte 4 / 5<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">Constancia<br/>Sostenible</h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">Alineada a tus ciclos, no a la fórmula de afuera</p>
+    </div>
+  </div>
+
+  <!-- ══════ S17 · NO ES PUBLICAR 3X AL DÍA ══════ -->
+  <div class="slide" id="s17" data-idx="16">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">Lo que se suele escuchar afuera</div>
+      <h2 class="h-display h2 ra">No es publicar<br/><em>tres veces al día</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        La constancia real nace de tus ciclos y tu cuerpo, no de una fórmula genérica.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Las fórmulas externas no consideran tu energía, tu cuerpo ni tus ciclos</span></li>
+        <li class="r"><span class="bul"></span><span>Forzar un ritmo que no es tuyo termina en agotamiento, no en resultados</span></li>
+        <li class="r"><span class="bul"></span><span>La constancia sostenible se construye desde lo que es realista para ti</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S18 · MIMI — QUE NO SE SIENTA AMENAZA ══════ -->
+  <div class="slide" id="s18" data-idx="17">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:700px;">
+      <div class="label ra">Guiado por Mimi</div>
+      <h2 class="h-display h2 ra">Que no se sienta<br/><em>una amenaza</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:6px;">
+        Realista y sostenible. Alineado a tu energía. Coherente contigo misma.
+      </p>
+      <div class="quote-block r">
+        <p>"No tiene que ser pesado. Que sea alineado a tu energía, coherente contigo misma — no forzado ni exigido."</p>
+        <span>— Mimi</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S19 · EJERCICIO — CUÁNTAS PUBLICACIONES SOSTENER ══════ -->
+  <div class="slide part-divider" id="s19" data-idx="18">
+    <div style="text-align:center;position:relative;z-index:2;">
+      <div class="label r">Para aterrizarlo</div>
+      <div class="act-circle r">
+        <div class="act-tag">Ejercicio práctico</div>
+        <div class="act-title">¿Cuántas publicaciones<br/><em>puedes sostener</em> esta semana?</div>
+        <div class="act-by">Defínelo desde lo que es realista para ti — no desde lo que "deberías"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S20 · DIVIDER PARTE 5 ══════ -->
+  <div class="slide part-divider" id="s20" data-idx="19">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Parte 5 / 5<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">La Consecuencia<br/><em>Natural</em></h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">El camino que recorre tu cliente</p>
+    </div>
+  </div>
+
+  <!-- ══════ S21 · DE LA AUTORIDAD NACE LA ESCALERA ══════ -->
+  <div class="slide" id="s21" data-idx="20">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">El proceso que se abre</div>
+      <h2 class="h-display h2 ra">De la autoridad<br/><em>nace la escalera</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle r" style="margin-bottom:26px;">
+        Solo cuando construyes autoridad real, se hace posible la escalera de valor: toda la gama de productos que tu cliente puede recorrer.
+      </p>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>La escalera de valor surge de todo lo que trabajaste en las piezas anteriores</span></li>
+        <li class="r"><span class="bul"></span><span>No se fuerza — se sostiene desde lo que tú misma puedes sostener por dentro</span></li>
+        <li class="r"><span class="bul"></span><span>Cada producto es un paso más en la transformación que tu cliente ya empezó a vivir contigo</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S22 · FÓRMULA CLARIDAD + AUTORIDAD + CONFIANZA = VENTA ══════ -->
+  <div class="slide" id="s22" data-idx="21">
+    <div class="label ra">La fórmula detrás de la venta</div>
+    <h2 class="h-display h2 ra">Claridad + Autoridad + Confianza</h2>
+    <div class="divider ra"></div>
+    <div class="formula-row r">
+      <div class="f-pill">Claridad</div>
+      <div class="f-op">+</div>
+      <div class="f-pill">Autoridad</div>
+      <div class="f-op">+</div>
+      <div class="f-pill">Confianza</div>
+      <div class="f-op">=</div>
+      <div class="f-pill result">Venta</div>
+    </div>
+  </div>
+
+  <!-- ══════ S23 · EJEMPLO REAL — CUANDO COMPRARON LA MARCA ══════ -->
+  <div class="slide" id="s23" data-idx="22">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="label ra">Esto ya lo vivieron con ustedes mismas</div>
+      <h2 class="h-display h2 ra">Lo que pasó<br/><em>cuando compraron la marca</em></h2>
+      <div class="divider ra"></div>
+      <div class="quote-block r" style="max-width:660px;">
+        <p>"¿Tuvieron claridad? Muchas me vieron como una autoridad. Les generé confianza. Y eso les permitió dar el paso para adquirir el tema de la marca en su momento."</p>
+        <span>— El mismo proceso que hoy vive tu cliente, de forma inconsciente</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S24 · CIERRE ══════ -->
+  <div class="slide" id="s24" data-idx="23">
+    <div class="orb" style="width:520px;height:520px;background:radial-gradient(circle,rgba(212,184,126,0.14) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="label r">Para cerrar</div>
+      <h1 class="h-display h1 r">Cinco piezas.<br/><em>Un solo mapa.</em></h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r" style="max-width:600px;">
+        La venta deja de ser una lucha y se convierte en la consecuencia natural de un negocio bien estructurado.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /presentation -->
+
+<!-- ── FIXED UI ── -->
+<div id="logo"><img src="assets/icono.png" alt="MAD" /></div>
+<div id="counter"><span id="cur">1</span> / <span id="tot">1</span></div>
+<div id="progress"></div>
+<button class="nav" id="prev">‹</button>
+<button class="nav" id="next">›</button>
+
+<script>
+  function mcStep(id, dir) {
+    const wrap = document.getElementById(id);
+    const imgs = Array.from(wrap.querySelectorAll('img'));
+    let idx = imgs.findIndex(im => im.classList.contains('mc-active'));
+    imgs[idx].classList.remove('mc-active');
+    idx = (idx + dir + imgs.length) % imgs.length;
+    imgs[idx].classList.add('mc-active');
+    wrap.querySelector('.mc-cur').textContent = idx + 1;
+  }
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const TOTAL  = slides.length;
+  let cur = 0;
+  document.getElementById('tot').textContent = TOTAL;
+
+  /* build progress dots */
+  const prog = document.getElementById('progress');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.addEventListener('click', () => goTo(i));
+    prog.appendChild(d);
+  });
+
+  /* .r  = click-reveals */
+  function reveals(idx) {
+    return Array.from(slides[idx].querySelectorAll('.r'));
+  }
+  function shownCount(idx) {
+    return reveals(idx).filter(el => el.classList.contains('show')).length;
+  }
+  function showAll(idx) {
+    slides[idx].querySelectorAll('.r, .ra').forEach(el => el.classList.add('show'));
+  }
+  function hideAll(idx) {
+    slides[idx].querySelectorAll('.r, .ra').forEach(el => el.classList.remove('show'));
+  }
+
+  /* .ra = auto-reveal (title/label/divider) con stagger al activar slide.
+     Bloquea advance() mientras anima para que los bullets no salgan al mismo tiempo. */
+  let locked = false;
+
+  function autoReveal(idx) {
+    const raEls = Array.from(slides[idx].querySelectorAll('.ra'));
+    if (raEls.length === 0) return;
+    locked = true;
+    raEls.forEach((el, i) => {
+      setTimeout(() => el.classList.add('show'), 80 + i * 110);
+    });
+    const unlockAt = 80 + (raEls.length - 1) * 110 + 450;
+    setTimeout(() => { locked = false; }, unlockAt);
+  }
+
+  /* portada = static, show everything immediately */
+  const STATIC = [0];
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur = idx;
+    slides[cur].classList.add('active');
+    hideAll(cur);
+    if (STATIC.includes(cur)) {
+      showAll(cur);
+    } else {
+      autoReveal(cur);
+    }
+    updateUI();
+  }
+
+  function advance() {
+    if (locked) return;
+    const rv = reveals(cur);
+    const shown = shownCount(cur);
+    if (shown < rv.length) {
+      rv[shown].classList.add('show');
+    } else if (cur < TOTAL - 1) {
+      goTo(cur + 1);
+    }
+  }
+
+  function retreat() {
+    if (cur > 0) goTo(cur - 1);
+  }
+
+  function updateUI() {
+    document.getElementById('cur').textContent = cur + 1;
+    document.querySelectorAll('.dot').forEach((d, i) =>
+      d.classList.toggle('on', i === cur));
+  }
+
+  /* events */
+  document.addEventListener('click', e => {
+    if (e.target.closest('.nav') || e.target.closest('#progress')) return;
+    advance();
+  });
+  document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); retreat(); });
+  document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); advance(); });
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','Space','Enter'].includes(e.code)) { e.preventDefault(); advance(); }
+    if (e.code === 'ArrowLeft') retreat();
+    if (e.code === 'Home') goTo(0);
+    if (e.code === 'End') goTo(TOTAL - 1);
+  });
+
+  let tx = null;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) dx < 0 ? advance() : retreat();
+    else advance();
+    tx = null;
+  });
+
+  /* init */
+  updateUI();
+  if (STATIC.includes(0)) showAll(0);
+</script>
+</body>
+</html>
