@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Primer Paso — Mujer Alquímica Digital</title>
+  <link rel="icon" href="assets/icono.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    @font-face {
+      font-family: 'Michelia';
+      src: url('assets/Michelia.otf') format('opentype');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+
+    :root {
+      --verde:        #97a585;
+      --verde-dark:   #6b7a5a;
+      --azul:         #263549;
+      --azul-dark:    #1a2535;
+      --azul-mid:     #1e2d40;
+      --terracota:    #9e5038;
+      --terra-light:  #c8705a;
+      --dorado:       #d4b87e;
+      --dorado-claro: #f7d795;
+      --dorado-osc:   #a18348;
+      --crema:        #e9ddc3;
+      --crema-dim:    rgba(233,221,195,0.75);
+      --blanco:       #fdfaf5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--azul-dark);
+      font-family: 'Raleway', sans-serif;
+      color: var(--crema);
+      user-select: none;
+    }
+
+    #presentation { position: relative; width: 100%; height: 100%; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 56px 80px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+      overflow-y: auto;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── REVEAL: requires click — solo fade, sin translateY ── */
+    .r { opacity: 0; transition: opacity 0.4s ease; }
+    .r.show { opacity: 1; }
+
+    /* ── REVEAL: auto on slide enter (title/label/divider) — slides down from above ── */
+    .ra { opacity: 0; transform: translateY(-12px); transition: opacity 0.45s ease, transform 0.45s ease; }
+    .ra.show { opacity: 1; transform: translateY(0); }
+
+    /* ── FIXED UI ── */
+    #logo { position: fixed; top: 22px; left: 28px; z-index: 200; opacity: 0.45; }
+    #logo img { width: 26px; height: auto; }
+
+    #counter {
+      position: fixed; top: 24px; right: 32px;
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.12em; color: rgba(212,184,126,0.38); z-index: 200;
+    }
+
+    #progress {
+      position: fixed; bottom: 26px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 200;
+      max-width: 90vw; flex-wrap: wrap; justify-content: center;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(212,184,126,0.28); cursor: pointer; transition: background 0.3s, transform 0.3s; }
+    .dot.on { background: var(--dorado); transform: scale(1.45); }
+
+    .nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(212,184,126,0.08);
+      border: 1px solid rgba(212,184,126,0.18);
+      color: var(--dorado); font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 200; transition: background 0.2s;
+    }
+    .nav:hover { background: rgba(212,184,126,0.16); }
+    #prev { left: 18px; }
+    #next { right: 18px; }
+
+    /* ── TYPOGRAPHY ── */
+    .label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--dorado); margin-bottom: 14px; }
+    .h-display { font-family: 'Michelia', Georgia, serif; font-weight: normal; line-height: 1.1; }
+    .h1 { font-size: clamp(2.6rem, 6vw, 5.6rem); color: var(--crema); text-align: center; }
+    .h1 em { color: var(--dorado-claro); font-style: normal; }
+    .h1-sub { margin-top: -6px; font-family: 'Raleway', sans-serif; font-weight: 300; font-size: clamp(1.3rem, 2.7vw, 1.75rem); line-height: 1.2; color: var(--dorado-claro); text-align: center; }
+    .h2 { font-size: clamp(1.7rem, 3.6vw, 3rem); color: var(--dorado-claro); text-align: center; margin-bottom: 10px; }
+    .h2 em { color: var(--verde); font-style: normal; }
+    .h2 em.terra { color: var(--terra-light); font-style: normal; }
+
+    .subtitle { font-size: clamp(0.92rem, 1.7vw, 1.18rem); font-weight: 300; line-height: 1.72; color: var(--crema-dim); text-align: center; max-width: 700px; }
+    .divider { width: 52px; height: 1px; background: var(--dorado); opacity: 0.5; margin: 16px auto 20px; }
+
+    /* ── POINTS LIST ── */
+    .points { list-style: none; display: flex; flex-direction: column; gap: 13px; max-width: 700px; margin: 0 auto; text-align: left; }
+    .points li { display: flex; align-items: flex-start; gap: 13px; font-size: clamp(0.86rem, 1.4vw, 1.02rem); line-height: 1.6; color: var(--blanco); }
+    .bul { width: 6px; height: 6px; border-radius: 50%; background: var(--dorado); flex-shrink: 0; margin-top: 7px; }
+    .bul.t { background: var(--terra-light); }
+    .bul.v { background: var(--verde); }
+
+    /* ── ORB ── */
+    .orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(90px); }
+
+    /* ══ PORTADA ══ */
+    #s1 { background: var(--azul-dark); }
+    #s1 .orb1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(158,80,56,0.2) 0%, transparent 68%); top: -180px; right: -80px; }
+    #s1 .orb2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(212,184,126,0.12) 0%, transparent 68%); bottom: -140px; left: -120px; }
+    #s1 .inner { position: relative; z-index: 2; text-align: center; }
+    #s1 .s1-icon { width: 52px; height: auto; display: block; margin: 0 auto 22px; opacity: 0.95; }
+    .event-line { font-size: 0.8rem; letter-spacing: 0.05em; color: var(--dorado-claro); opacity: 0.9; margin-top: 22px; line-height: 1.7; }
+    .event-line strong { color: var(--dorado-claro); font-weight: 600; }
+
+    /* ══ PILL genérico (dividers de parte) ══ */
+    .pill { display: inline-flex; align-items: center; gap: 10px; background: rgba(212,184,126,0.08); border: 1px solid rgba(212,184,126,0.22); border-radius: 100px; padding: 7px 22px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dorado); margin-bottom: 30px; }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); opacity: 0.6; }
+
+    /* ══ ÍNDICE ══ */
+    .index-list { list-style: none; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 640px; margin-top: 8px; }
+    .index-item { display: flex; align-items: baseline; gap: 20px; }
+    .index-num { font-family: 'Michelia', serif; font-size: 1.5rem; color: var(--dorado); opacity: 0.85; width: 34px; text-align: right; flex-shrink: 0; }
+    .index-title { font-family: 'Michelia', serif; font-size: clamp(1.05rem, 1.9vw, 1.35rem); color: var(--blanco); }
+    .index-title small { display: block; font-family: 'Raleway', sans-serif; font-size: 0.72rem; font-weight: 300; letter-spacing: 0.04em; color: var(--blanco); margin-top: 3px; }
+
+    /* ══ QUOTE / TESTIMONIO ══ */
+    .quote-block { border-left: 3px solid var(--dorado); padding: 14px 22px; background: rgba(212,184,126,0.05); border-radius: 0 12px 12px 0; text-align: left; margin-top: 22px; max-width: 700px; }
+    .quote-block p { font-family: 'Michelia', serif; font-size: clamp(0.9rem, 1.6vw, 1.15rem); font-style: italic; line-height: 1.55; color: var(--crema); }
+    .quote-block span { display: block; margin-top: 8px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dorado); }
+    .quote-block.sans p { font-family: 'Raleway', sans-serif; font-style: normal; font-weight: 300; font-size: clamp(0.95rem, 1.7vw, 1.15rem); }
+    .quote-block.white p { color: var(--blanco); }
+    .subtitle.white { color: var(--blanco); }
+    .tag-v { color: var(--verde); }
+    .tag-g { color: var(--dorado-claro); }
+    .quote-caption { margin-top: 16px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dorado); text-align: center; max-width: 700px; }
+
+    /* ══ ACTIVACIÓN / EJERCICIO (círculo) ══ */
+    .act-circle {
+      width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(212,184,126,0.22);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 36px; position: relative; margin-top: 28px;
+    }
+    .act-circle::before { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1px solid rgba(212,184,126,0.1); }
+    .act-circle::after  { content: ''; position: absolute; inset: -28px; border-radius: 50%; border: 1px solid rgba(212,184,126,0.05); }
+    .act-tag { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dorado); opacity: 0.65; margin-bottom: 10px; }
+    .act-title { font-family: 'Raleway', sans-serif; font-weight: 400; font-size: clamp(1.2rem, 2.2vw, 1.7rem); line-height: 1.28; color: var(--blanco); }
+    .act-title em { font-family: 'Michelia', serif; color: var(--dorado-claro); font-style: normal; }
+    .act-by { font-size: 0.78rem; margin-top: 12px; color: var(--crema); opacity: 0.45; letter-spacing: 0.06em; max-width: 320px; }
+
+    /* ══ DIVIDER DE PARTE (fondo con orb) ══ */
+    .part-divider { background: radial-gradient(ellipse at center, rgba(158,80,56,0.16) 0%, var(--azul-dark) 62%); }
+
+    /* ══ % CONTENIDO (Autoridad / Educación / Venta) — reutilizado en Módulo 3 ══ */
+    .pct-row { display: flex; gap: 20px; width: 100%; max-width: 920px; margin-top: 22px; flex-wrap: wrap; justify-content: center; }
+    .pct-card { flex: 1 1 220px; max-width: 260px; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.18); border-radius: 16px; padding: 22px 20px; text-align: center; }
+    .pct-num { font-family: 'Michelia', serif; font-size: 2.1rem; color: var(--dorado-claro); line-height: 1; }
+    .pct-bar-track { width: 100%; height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); margin: 12px 0 12px; overflow: hidden; }
+    .pct-bar-fill { height: 100%; border-radius: 4px; background: var(--dorado); }
+    .pct-title { font-family: 'Michelia', serif; font-size: 1rem; color: var(--crema); margin-bottom: 6px; }
+    .pct-desc { font-size: 0.74rem; opacity: 0.7; line-height: 1.45; color: rgba(233,221,195,0.85); }
+
+    /* ══ FÓRMULA (reutilizada en creencia de venta) ══ */
+    .formula-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 22px; max-width: 900px; }
+    .f-pill { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.22); border-radius: 100px; padding: 13px 22px; font-family: 'Michelia', serif; font-size: clamp(0.85rem, 1.6vw, 1.05rem); color: var(--crema); text-align: center; }
+    .f-pill.result { background: rgba(212,184,126,0.12); border-color: var(--dorado); color: var(--dorado-claro); font-size: clamp(0.95rem, 1.8vw, 1.2rem); }
+    .f-op { font-size: 1.3rem; color: var(--dorado); opacity: 0.6; font-family: 'Michelia', serif; }
+
+    /* ══ FILTRO (para quién sí / no) — dos columnas ══ */
+    .filter-cols { display: flex; gap: 40px; width: 100%; max-width: 900px; margin-top: 6px; flex-wrap: wrap; justify-content: center; }
+    .filter-col { flex: 1 1 320px; max-width: 400px; }
+    .filter-head { font-family: 'Michelia', serif; font-size: 1.26rem; margin-bottom: 14px; text-align: center; }
+    .filter-head.yes { color: var(--verde); }
+    .filter-head.no  { color: var(--terra-light); }
+    .filter-col .points { max-width: none; }
+    .filter-col .points li { font-size: clamp(0.8rem, 1.25vw, 0.92rem); }
+
+    /* ══ AUTORIDAD DUAL ══ */
+    .authority-row { display: flex; gap: 22px; width: 100%; max-width: 780px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+    .authority-card { flex: 1 1 300px; max-width: 350px; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,184,126,0.2); border-radius: 16px; padding: 26px 22px; text-align: center; }
+    .authority-order { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra-light); margin-bottom: 8px; }
+    .authority-tag { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dorado); opacity: 0.8; margin-bottom: 8px; }
+    .authority-name { font-family: 'Michelia', serif; font-size: 1.3rem; color: var(--crema); margin-bottom: 8px; }
+    .authority-desc { font-size: 0.78rem; line-height: 1.55; color: rgba(233,221,195,0.75); }
+
+    /* ══ CREENCIA → REINTERPRETACIÓN ══ */
+    .belief-card { width: 100%; max-width: 680px; margin-top: 16px; display: flex; flex-direction: column; gap: 14px; }
+    .belief-old { border-left: 3px solid rgba(233,221,195,0.28); padding: 12px 20px; text-align: left; }
+    .belief-old .belief-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,221,195,0.5); margin-bottom: 6px; }
+    .belief-old p { font-size: clamp(0.85rem, 1.4vw, 0.98rem); line-height: 1.55; color: rgba(233,221,195,0.85); font-style: italic; text-decoration: none; transition: color 0.3s ease; }
+    .belief-card:has(.belief-reveal.show) .belief-old p { color: rgba(233,221,195,0.5); text-decoration: line-through; text-decoration-color: rgba(233,221,195,0.35); }
+    .belief-arrow { text-align: center; color: var(--dorado); opacity: 0.55; font-size: 1.1rem; }
+    .belief-new { border-left: 3px solid var(--dorado); padding: 14px 20px; background: rgba(212,184,126,0.06); border-radius: 0 12px 12px 0; text-align: left; }
+    .belief-new .belief-label { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dorado); margin-bottom: 6px; }
+    .belief-new p { font-family: 'Raleway', sans-serif; font-weight: 400; font-size: clamp(0.95rem, 1.7vw, 1.15rem); line-height: 1.6; color: var(--blanco); }
+
+    /* ══ MÓDULO DETALLE ══ */
+    .module-tag { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dorado); opacity: 0.8; margin-bottom: 4px; text-align: center; }
+    .deliverable-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(212,184,126,0.1); border: 1px solid rgba(212,184,126,0.3); border-radius: 100px; padding: 9px 20px; font-size: clamp(0.72rem, 1.2vw, 0.82rem); color: var(--dorado-claro); margin-top: 18px; text-align: center; }
+
+    /* ══ PRECIO ══ */
+    .price-wrap { text-align: center; margin-top: 14px; }
+    .price-num { font-family: 'Michelia', serif; font-size: clamp(3.2rem, 8vw, 5.6rem); color: var(--dorado-claro); line-height: 1; }
+    .price-sub { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--crema-dim); margin-top: 12px; }
+
+    /* ══ BONO ══ */
+    .bonus-wrap { width: 100%; max-width: 680px; margin-top: 10px; text-align: left; }
+    .bonus-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(158,80,56,0.14); border: 1px solid rgba(200,112,90,0.35); border-radius: 100px; padding: 6px 18px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra-light); margin-bottom: 16px; }
+    .bonus-name { font-family: 'Michelia', serif; font-size: clamp(1.15rem, 2.1vw, 1.5rem); color: var(--crema); margin-bottom: 10px; }
+    .bonus-desc { font-size: clamp(0.82rem, 1.3vw, 0.92rem); line-height: 1.6; color: rgba(233,221,195,0.8); }
+    .bonus-note { margin-top: 16px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dorado-claro); }
+
+    /* ══ WORKBOOK — texto + imagen lado a lado ══ */
+    .workbook-row { display: flex; align-items: center; gap: 48px; width: 100%; max-width: 920px; flex-wrap: wrap; justify-content: center; }
+    .workbook-text { flex: 1 1 320px; max-width: 420px; text-align: left; }
+    .workbook-text .h2 { text-align: left; }
+    .workbook-text .divider { margin: 16px 0 22px; }
+    .img-slot { flex: 1 1 260px; max-width: 320px; aspect-ratio: 4 / 5; border: 1.5px dashed rgba(212,184,126,0.35); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.02); }
+    .img-slot .slot-icon { font-size: 1.6rem; opacity: 0.5; }
+    .img-slot .slot-text { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; text-align: center; padding: 0 14px; }
+
+    /* ══ URGENCIA ══ */
+    .urgency-box { border: 1.5px solid var(--terra-light); background: rgba(158,80,56,0.08); border-radius: 16px; padding: 24px 28px; max-width: 640px; margin-top: 20px; text-align: center; }
+    .urgency-tag { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra-light); margin-bottom: 10px; }
+    .urgency-text { font-family: 'Michelia', serif; font-size: clamp(1rem, 1.9vw, 1.3rem); color: var(--crema); line-height: 1.45; }
+  </style>
+</head>
+<body>
+
+<div id="presentation">
+
+  <!-- ══════ S1 · PORTADA ══════ -->
+  <div class="slide active" id="s1" data-idx="0">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="inner">
+      <img src="assets/icono.png" alt="Mujer Alquímica Digital" class="s1-icon" />
+      <div class="label" style="margin-bottom:22px;">Masterclass en vivo</div>
+      <h1 class="h-display h1">El Primer Paso<br /><em>en Redes Sociales</em></h1>
+      <div class="divider" style="opacity:0.45;"></div>
+      <p class="subtitle" style="max-width:640px;">
+        Para mostrar lo que ya sabes hacer sin esperar a sentirte lista.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ S2 · HOOK ══════ -->
+  <div class="slide" id="s2" data-idx="1">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="label ra">Si esto te suena, quédate</div>
+      <h1 class="h-display h1 ra">«No salgo a hablar.»<br/><em>«Tengo pánico a la visibilidad.»</em></h1>
+      <div class="divider ra" style="opacity:0.45;"></div>
+      <p class="subtitle white r">Si te ha pasado, quiero que sepas algo antes de seguir: no es lo que crees.</p>
+    </div>
+  </div>
+
+  <!-- ══════ S3 · LA RAÍZ REAL ══════ -->
+  <div class="slide" id="s3" data-idx="2">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="label ra">La raíz real</div>
+      <h2 class="h-display h2 ra">No es que no tengas<br/><em>nada que decir</em></h2>
+      <div class="divider ra"></div>
+      <div class="quote-block sans white r">
+        <p>"Es que lo tienes todo adentro al mismo tiempo. Tanta sabiduría, tantos datos, tantas herramientas — que no sabes por dónde empezar, qué es lo más importante o cómo conectar una cosa con otra sin confundir a nadie. Y el cuerpo, ante la duda, se congela."</p>
+      </div>
+      <p class="quote-caption r">Ese corto circuito tiene nombre: saturación y falta de síntesis</p>
+    </div>
+  </div>
+
+  <!-- ══════ S4 · LA PROMESA ══════ -->
+  <div class="slide" id="s4" data-idx="3">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:740px;">
+      <div class="label ra">Lo que vas a vivir hoy</div>
+      <h2 class="h-display h2 ra">Vas a entender por qué te congelas...<br/><em>y vas a salir con tu primer paso listo</em></h2>
+      <div class="divider ra"></div>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Por qué tu cuerpo se paraliza frente a la cámara o la hoja en blanco — y no es lo que crees</span></li>
+        <li class="r"><span class="bul"></span><span>Las creencias que te mantienen atascada, desmenuzadas una por una</span></li>
+        <li class="r"><span class="bul"></span><span>Un primer paso tangible que te llevas hecho, no solo entendido</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S5 · FILTRO — PARA QUIÉN SÍ / NO ══════ -->
+  <div class="slide" id="s5" data-idx="4">
+    <div class="label ra">Un filtro claro, antes de seguir</div>
+    <h2 class="h-display h2 ra">¿Es esto <em>para ti</em>?</h2>
+    <div class="divider ra"></div>
+    <div class="filter-cols">
+      <div class="filter-col r">
+        <div class="filter-head yes">Sí es para ti si...</div>
+        <ul class="points">
+          <li><span class="bul v"></span><span>Estás lista para integrar mente, cuerpo y estrategia — no solo una de las dos</span></li>
+          <li><span class="bul v"></span><span>Quieres construir una propuesta con raíz y longevidad, no un truco viral</span></li>
+          <li><span class="bul v"></span><span>Estás dispuesta a mirar tu cuerpo y tu energía como parte real de tu negocio</span></li>
+          <li><span class="bul v"></span><span>Quieres pasar de la teoría a ejecutar: mostrarte, hablar, ordenar tu oferta</span></li>
+        </ul>
+      </div>
+      <div class="filter-col r">
+        <div class="filter-head no">No es para ti si...</div>
+        <ul class="points">
+          <li><span class="bul t"></span><span>Buscas la receta mágica o la fórmula viral para facturar ya, sin sostener las bases</span></li>
+          <li><span class="bul t"></span><span>Solo quieres estructura fría, técnica, desconectada del cuerpo</span></li>
+          <li><span class="bul t"></span><span>Prefieres quedarte en lo espiritual sin bajar nunca a la acción</span></li>
+          <li><span class="bul t"></span><span>Esperas que el programa —o nosotras— te resuelvan la vida sin que tú te muevas</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S6 · AUTORIDAD DUAL ══════ -->
+  <div class="slide" id="s6" data-idx="5">
+    <div class="label ra">¿Por quiénes vamos a caminar esto?</div>
+    <h2 class="h-display h2 ra">Dos miradas,<br/><em>un mismo método</em></h2>
+    <div class="divider ra"></div>
+    <div class="authority-row r">
+      <div class="authority-card">
+        <div class="authority-tag">Enfoque somático y energético</div>
+        <div class="authority-name">Mimi</div>
+        <div class="authority-desc">Regulación del sistema nervioso, ritmo biológico de creación y la astrología de tu mensaje.</div>
+      </div>
+      <div class="authority-card">
+        <div class="authority-tag">Enfoque estratégico</div>
+        <div class="authority-name">Ale</div>
+        <div class="authority-desc">Mensaje, pilares de contenido, sistema de publicación y presentación de tu oferta.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S7 · DIVIDER — EL PROBLEMA DESMENUZADO ══════ -->
+  <div class="slide part-divider" id="s7" data-idx="6">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>El problema<span class="pill-dot"></span></div>
+      <div class="r">
+        <h1 class="h-display h1">Por qué te congelas</h1>
+        <p class="h1-sub">(y no es lo que crees)</p>
+      </div>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">La creencia central y las cuatro creencias que la sostienen</p>
+    </div>
+  </div>
+
+  <!-- ══════ S8 · CREENCIA CENTRAL ══════ -->
+  <div class="slide" id="s8" data-idx="7">
+    <div class="label ra">La creencia que hay que voltear</div>
+    <h2 class="h-display h2 ra">La verdad <em>alquímica</em></h2>
+    <div class="divider ra"></div>
+    <div class="belief-card">
+      <div class="belief-old r">
+        <div class="belief-label">Creías</div>
+        <p>"El problema es que no sé qué publicar o no entiendo de marketing."</p>
+      </div>
+      <div class="belief-reveal r">
+        <div class="belief-arrow">↓</div>
+        <div class="belief-new">
+          <div class="belief-label">La verdad</div>
+                  <p>No estás bloqueada por falta de contenido. Tu cuerpo entra en alerta porque intentas encajar tu trabajo en fórmulas frías que no respetan tu energía ni tu ritmo natural. Cuando le das paz a tu cuerpo y ordenas tu mensaje, la voz y la presencia fluyen solas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S9 · CREENCIA SECUNDARIA 1 — MOMENTO PERFECTO ══════ -->
+  <div class="slide" id="s9" data-idx="8">
+    <div class="label ra">Sobre la preparación y el momento perfecto</div>
+    <h2 class="h-display h2 ra">"Necesito estar <em>100% lista</em>"</h2>
+    <div class="divider ra"></div>
+    <div class="belief-card">
+      <div class="belief-old r">
+        <div class="belief-label">Creías</div>
+        <p>"Necesito hacer un curso más, tener la foto o la cámara perfecta, o sentirme 100% segura antes de empezar a mostrarme."</p>
+      </div>
+      <div class="belief-reveal r">
+        <div class="belief-arrow">↓</div>
+        <div class="belief-new">
+          <div class="belief-label">La verdad</div>
+                  <p>La seguridad no llega antes de actuar; se construye mientras das el paso. Lo que sabes hoy y lo que eres hoy ya es suficiente para ayudar a alguien.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S10 · CREENCIA SECUNDARIA 2 — ESFUERZO Y CONSTANCIA ══════ -->
+  <div class="slide" id="s10" data-idx="9">
+    <div class="label ra">Sobre el esfuerzo y la constancia</div>
+    <h2 class="h-display h2 ra">"Tengo que publicar<br/><em>todos los días</em>"</h2>
+    <div class="divider ra"></div>
+    <div class="belief-card">
+      <div class="belief-old r">
+        <div class="belief-label">Creías</div>
+        <p>"Para tener resultados en redes sociales tengo que publicar todos los días, bailar en Reels y actuar como un robot."</p>
+      </div>
+      <div class="belief-reveal r">
+        <div class="belief-arrow">↓</div>
+        <div class="belief-new">
+          <div class="belief-label">La verdad</div>
+                  <p>La constancia rígida te quema. Lo que funciona es el ritmo sostenible: una presencia estratégica que respeta los ciclos de tu cuerpo y la astrología de tu mensaje.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S11 · CREENCIA SECUNDARIA 3 — VENTA Y MEDICINA ══════ -->
+  <div class="slide" id="s11" data-idx="10">
+    <div class="label ra">Sobre la venta y tu medicina</div>
+    <h2 class="h-display h2 ra">"Vender se siente <em>falso</em>"</h2>
+    <div class="divider ra"></div>
+    <div class="belief-card">
+      <div class="belief-old r">
+        <div class="belief-label">Creías</div>
+        <p>"Vender mi trabajo holístico o terapéutico se siente falso, frío, o como si estuviera rogando."</p>
+      </div>
+      <div class="belief-reveal r">
+        <div class="belief-arrow">↓</div>
+        <div class="belief-new">
+          <div class="belief-label">La verdad</div>
+                  <p>Vender no es presionar; es servir. La venta es solo la consecuencia natural de tener claridad, autoridad y confianza.</p>
+        </div>
+      </div>
+    </div>
+    <div class="formula-row r">
+      <div class="f-pill">Claridad</div>
+      <div class="f-op">+</div>
+      <div class="f-pill">Autoridad</div>
+      <div class="f-op">+</div>
+      <div class="f-pill">Confianza</div>
+      <div class="f-op">=</div>
+      <div class="f-pill result">Venta</div>
+    </div>
+  </div>
+
+  <!-- ══════ S12 · CREENCIA SECUNDARIA 4 — COMPARACIÓN ══════ -->
+  <div class="slide" id="s12" data-idx="11">
+    <div class="label ra">Sobre la comparación y el ritmo ajeno</div>
+    <h2 class="h-display h2 ra">"Voy <em>atrasada</em>"</h2>
+    <div class="divider ra"></div>
+    <div class="belief-card">
+      <div class="belief-old r">
+        <div class="belief-label">Creías</div>
+        <p>"Siento que voy atrasada mientras las demás avanzan y ya lo tienen todo resuelto."</p>
+      </div>
+      <div class="belief-reveal r">
+        <div class="belief-arrow">↓</div>
+        <div class="belief-new">
+          <div class="belief-label">La verdad</div>
+                  <p>La diferencia entre quienes publican y tú no es que ellas sepan más; es que encontraron una vasija — una estructura clara — que protege su energía y no las deja sobrepensar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S13 · MAPA DEL PRIMER PASO (DESEABILIDAD) ══════ -->
+  <div class="slide" id="s13" data-idx="12">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="label ra">Ya lo entendiste. Ahora, el camino.</div>
+      <h2 class="h-display h2 ra">Así se ve <em>tu primer paso</em></h2>
+      <div class="divider ra"></div>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>No se trata de tener más información — se trata de ordenar lo que ya sabes en una síntesis que puedas repetir cada semana</span></li>
+        <li class="r"><span class="bul"></span><span>Existe una manera de regular tu cuerpo, encontrar tu voz y publicar sin sobrepensar</span></li>
+        <li class="r"><span class="bul"></span><span>Hoy te muestro por dónde empieza — y lo vamos a bajar juntas, aquí mismo</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S14 · EJERCICIO SOMÁTICO EN VIVO ══════ -->
+  <div class="slide part-divider" id="s14" data-idx="13">
+    <div style="text-align:center;position:relative;z-index:2;">
+      <div class="label r">Para sentirlo antes de estructurarlo</div>
+      <div class="act-circle r">
+        <div class="act-tag">Ejercicio somático en vivo</div>
+        <div class="act-title">Desbloqueo del cuerpo<br/><em>para hablar y mostrarte</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S15 · WORKBOOK — ENTREGABLE TANGIBLE ══════ -->
+  <div class="slide" id="s15" data-idx="14">
+    <div class="workbook-row">
+      <div class="workbook-text">
+        <div class="label ra">Manos en la masa</div>
+        <h2 class="h-display h2 ra" style="line-height:1.05;">Tu primer paso, hecho<br/><em>no solo entendido</em></h2>
+        <div class="divider ra"></div>
+      </div>
+      <div class="img-slot ra">
+        <div class="slot-icon">🖼️</div>
+        <div class="slot-text">Screenshot del Workbook</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S16 · DIVIDER — EL SIGUIENTE PASO ══════ -->
+  <div class="slide part-divider" id="s16" data-idx="15">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>El siguiente paso<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">De la Parálisis<br/><em>a la Constancia</em></h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">4 semanas para instalar lo que hoy solo empezaste a sentir</p>
+    </div>
+  </div>
+
+  <!-- ══════ S17 · RESULTADO MAYOR — FRASE ANCLA ══════ -->
+  <div class="slide" id="s17" data-idx="16">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:740px;">
+      <div class="label ra" style="color:var(--blanco);">El objetivo de estas 4 semanas</div>
+      <h2 class="h-display h2 r">No es llenar tu cabeza<br/>de más teoría</h2>
+      <div class="divider ra"></div>
+      <div class="quote-block white sans r">
+        <p>Es que publiques cada semana con claridad, soltura y en paz con tu energía — teniendo un mes entero de contenido organizado, sin agotarte.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S18 · ÍNDICE — LAS 4 SEMANAS ══════ -->
+  <div class="slide" id="s18" data-idx="17">
+    <div class="label ra">Estructura del programa</div>
+    <h2 class="h-display h2 ra">Cuatro semanas,<br/><em>un solo hilo conductor</em></h2>
+    <div class="divider ra"></div>
+    <ul class="index-list">
+      <li class="index-item r"><span class="index-num">01</span><span class="index-title">Regulación y Cimientos<small>Soltar la alerta del cuerpo y definir tu vasija estratégica</small></span></li>
+      <li class="index-item r"><span class="index-num">02</span><span class="index-title">La Astrología de tu Mensaje y tu Voz Única<small>Cómo comunica tu energía natural, sin copiar a nadie</small></span></li>
+      <li class="index-item r"><span class="index-num">03</span><span class="index-title">Creación Intencional y Sistema de Publicación<small>Perderle el miedo a la cámara e instalar el hábito</small></span></li>
+      <li class="index-item r"><span class="index-num">04</span><span class="index-title">Sostenibilidad y Presentación de tu Oferta<small>Vender desde la soltura, no desde la súplica</small></span></li>
+    </ul>
+  </div>
+
+  <!-- ══════ S19 · MÓDULO 1 ══════ -->
+  <div class="slide" id="s19" data-idx="18">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="module-tag ra">Semana 1</div>
+      <h2 class="h-display h2 ra">Regulación<br/><em>y Cimientos</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle white r" style="margin-bottom:22px;">Soltar la alerta del cuerpo y definir la vasija estratégica de tu negocio.</p>
+      <ul class="points">
+        <li class="r"><span class="bul v"></span><span><strong class="tag-v">Somático:</strong> regular el sistema nervioso antes de encender la cámara. Identificar tu ritmo biológico de creación</span></li>
+        <li class="r"><span class="bul"></span><span><strong class="tag-g">Estratégico:</strong> tu mensaje central y los 3 pilares de contenido de tu marca</span></li>
+      </ul>
+      <div class="deliverable-tag r">🎒 Tu Tablero de Claridad — perfil optimizado + biografía + 3 pilares</div>
+    </div>
+  </div>
+
+  <!-- ══════ S20 · MÓDULO 2 ══════ -->
+  <div class="slide" id="s20" data-idx="19">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="module-tag ra">Semana 2</div>
+      <h2 class="h-display h2 ra">La Astrología de tu Mensaje<br/><em>y tu Voz Única</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle white r" style="margin-bottom:22px;">Descubrir cómo comunica tu energía natural y definir tu estilo sin copiar a nadie.</p>
+      <ul class="points">
+        <li class="r"><span class="bul v"></span><span><strong class="tag-v">Somático:</strong> ¿tu voz es inspiradora, confrontativa, poética o estructurada?</span></li>
+        <li class="r"><span class="bul"></span><span><strong class="tag-g">Estratégico:</strong> guiones sencillos para Reels y textos que conecten sin dar rodeos</span></li>
+      </ul>
+      <div class="deliverable-tag r">🎒 Tu Banco de Ideas de Contenido, con estructura para que lo puedas seguir replicando</div>
+    </div>
+  </div>
+
+  <!-- ══════ S21 · MÓDULO 3 ══════ -->
+  <div class="slide" id="s21" data-idx="20">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:760px;">
+      <div class="module-tag ra">Semana 3</div>
+      <h2 class="h-display h2 ra">Creación Intencional<br/><em>y Sistema de Publicación</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle white r" style="margin-bottom:10px;">Perderle el miedo a la cámara e instalar el hábito con un método amigable.</p>
+      <ul class="points" style="margin-bottom:10px;">
+        <li class="r"><span class="bul v"></span><span><strong class="tag-v">Somático:</strong> desbloqueo de la garganta y la expresión. Soltar el perfeccionismo de "la foto perfecta"</span></li>
+        <li class="r"><span class="bul"></span><span><strong class="tag-g">Estratégico:</strong> organiza tu mes de contenido en solo 2 horas a la semana</span></li>
+      </ul>
+      <div class="deliverable-tag r">🎒 Tu Calendario Mensual Sostenible, organizado en solo 2 horas a la semana</div>
+    </div>
+  </div>
+
+  <!-- ══════ S22 · MÓDULO 4 ══════ -->
+  <div class="slide" id="s22" data-idx="21">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="module-tag ra">Semana 4</div>
+      <h2 class="h-display h2 ra">Sostenibilidad<br/><em>y Presentación de tu Oferta</em></h2>
+      <div class="divider ra"></div>
+      <p class="subtitle white r" style="margin-bottom:22px;">Perder la vergüenza a ofrecer tu trabajo y sostener tu presencia con soltura a largo plazo.</p>
+      <ul class="points">
+        <li class="r"><span class="bul v"></span><span><strong class="tag-v">Somático:</strong> anclaje de confianza corporal para sostener la mirada y la presencia</span></li>
+        <li class="r"><span class="bul"></span><span><strong class="tag-g">Estratégico:</strong> cómo invitar o vender tus servicios en redes de forma natural, ética y sin sentir que estás rogando</span></li>
+      </ul>
+      <div class="deliverable-tag r">🎒 Tu Secuencia de Venta Orgánica — guion + historia + post, lista para salir a redes</div>
+    </div>
+  </div>
+
+  <!-- ══════ S23 · AL CERRAR EL MES ══════ -->
+  <div class="slide" id="s23" data-idx="22">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:720px;">
+      <div class="label ra">Al cerrar el mes</div>
+      <h2 class="h-display h2 ra">No solo "entendiste" el concepto —<br/><em>lo tienes instalado</em></h2>
+      <div class="divider ra"></div>
+      <ul class="points">
+        <li class="r"><span class="bul"></span><span>Un perfil profesional y atractivo que explica en 3 segundos qué haces y a quién ayudas</span></li>
+        <li class="r"><span class="bul"></span><span>1 mes entero de contenido creado y organizado, sin haber quedado exhausta en el intento</span></li>
+        <li class="r"><span class="bul"></span><span>Un método personalizado para saber qué publicar cada semana según tu propia energía y tiempo real</span></li>
+        <li class="r"><span class="bul"></span><span>La paz interna y corporal de saber que tu voz vale, y que no necesitas actuar como nadie más</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════ S24 · FORMATO DEL CURSO ══════ -->
+  <div class="slide" id="s24" data-idx="23">
+    <div class="workbook-row">
+      <div class="workbook-text">
+        <div class="label ra">Cómo lo vamos a vivir juntas</div>
+        <h2 class="h-display h2 ra">Un acompañamiento,<br/><em>no solo un curso</em></h2>
+        <div class="divider ra"></div>
+        <ul class="points">
+          <li class="r"><span class="bul"></span><span>Formato híbrido: contenido grabado + sesiones en vivo de 1h30 por semana</span></li>
+          <li class="r"><span class="bul"></span><span>Grupo de WhatsApp con acompañamiento durante las 4 semanas</span></li>
+          <li class="r"><span class="bul"></span><span>Un módulo por semana — nada que sobreexigir, todo para sostener</span></li>
+        </ul>
+      </div>
+      <div class="img-slot ra">
+        <div class="slot-icon">🖼️</div>
+        <div class="slot-text">Mockup del curso</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S25 · PRECIO ══════ -->
+  <div class="slide" id="s25" data-idx="24">
+    <div class="label ra">Tu siguiente paso</div>
+    <h2 class="h-display h2 ra">De la Parálisis<br/><em>a la Constancia</em></h2>
+    <div class="divider ra"></div>
+    <div class="price-wrap r">
+      <div class="price-num">148 USD</div>
+      <div class="price-sub">4 semanas · en vivo + grabado · acompañamiento por WhatsApp</div>
+    </div>
+  </div>
+
+  <!-- ══════ S26 · BONO DE ACCIÓN RÁPIDA (ALE) ══════ -->
+  <div class="slide" id="s26" data-idx="25">
+    <div class="label ra">Si te inscribes hoy</div>
+    <h2 class="h-display h2 ra">Bono <em>1</em></h2>
+    <div class="divider ra"></div>
+    <div class="bonus-wrap r">
+      <div class="bonus-badge">Enfoque estratégico</div>
+      <div class="bonus-name"><span class="tag-g">Plantilla Dinámica:</span> <span style="color:var(--blanco);">"El Organizador Mensual de Contenido sin Estrés"</span></div>
+      <p class="bonus-desc">Una plantilla lista para usar, más 10 estructuras de guiones rápidos para Reels y carruseles — solo rellenas los espacios y tu mes queda ordenado, sin sobrepensar ni diseñar nada desde cero.</p>
+      <div class="quote-block" style="margin-top:16px;">
+        <p>"La herramienta exacta para organizar un mes entero de contenido en solo dos horas, sin perder tiempo ni energía."</p>
+      </div>
+      <div class="bonus-note">Para las 3 primeras personas</div>
+    </div>
+  </div>
+
+  <!-- ══════ S27 · BONO DE ACCIÓN RÁPIDA 2 (MIMI) ══════ -->
+  <div class="slide" id="s27" data-idx="26">
+    <div class="label ra">Si te inscribes hoy</div>
+    <h2 class="h-display h2 ra">Bono <em>2</em></h2>
+    <div class="divider ra"></div>
+    <div class="bonus-wrap r">
+      <div class="bonus-badge">Enfoque somático — regalo de Mimi</div>
+      <div class="bonus-name"><span class="tag-g">Audio Subliminal &amp; Trabajo de Integración:</span> <span style="color:var(--blanco);">"Desbloqueo Somático para la Voz y la Visibilidad"</span></div>
+      <p class="bonus-desc">Una activación en audio subliminal y guía práctica para calmar la alerta del sistema nervioso antes de encender la cámara o publicar — elimina el nudo en la garganta, la presión en el pecho y el miedo al juicio justo en el momento de crear.</p>
+      <div class="quote-block" style="margin-top:16px;">
+        <p>"Para que antes de escribir o grabar, tu cuerpo se sienta en paz, protegido y en absoluta seguridad de mostrar su medicina."</p>
+      </div>
+      <div class="bonus-note">Para las personas que compren en las 24 horas</div>
+    </div>
+  </div>
+
+  <!-- ══════ S29 · MANTRA DE CIERRE ══════ -->
+  <div class="slide" id="s29" data-idx="28">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:700px;">
+      <div class="label ra">En resumen</div>
+      <div class="quote-block white sans r" style="max-width:660px;">
+        <p>Vas a pasar de la parálisis a salir con tu mes de contenido organizado, para publicar cada semana en paz con tu energía — sin volver a sentir que Instagram te consume.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S30 · CTA FINAL ══════ -->
+  <div class="slide" id="s30" data-idx="29">
+    <div class="orb" style="width:480px;height:480px;background:radial-gradient(circle,rgba(212,184,126,0.14) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+    <div style="position:relative;z-index:2;text-align:center;max-width:700px;">
+      <div class="label r">Tu invitación</div>
+      <h1 class="h-display h1 r">¿Estás lista?</h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">Si estás lista para dejar de sobrepensar y tener tu mes de contenido organizado para publicar cada semana con fluidez, te acompañamos estas 4 semanas.</p>
+      <div class="price-wrap r">
+        <div class="price-num" style="font-size:clamp(2.2rem,5vw,3.4rem);">148 USD</div>
+        <div class="price-sub">+ 2 Bonos, solo hoy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ S31 · DIVIDER — PREGUNTAS ══════ -->
+  <div class="slide part-divider" id="s31" data-idx="30">
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="pill r"><span class="pill-dot"></span>Espacio en vivo<span class="pill-dot"></span></div>
+      <h1 class="h-display h1 r">Ahora,<br/><em>tus preguntas</em></h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r">Cuéntanos en el chat — abrimos micrófonos para resolver dudas</p>
+    </div>
+  </div>
+
+  <!-- ══════ S32 · CIERRE ══════ -->
+  <div class="slide" id="s32" data-idx="31">
+    <div class="orb" style="width:520px;height:520px;background:radial-gradient(circle,rgba(212,184,126,0.14) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+    <div style="position:relative;z-index:2;text-align:center;">
+      <div class="label r">Para cerrar</div>
+      <h1 class="h-display h1 r">De la Parálisis.<br/><em>A la Constancia.</em></h1>
+      <div class="divider r" style="opacity:0.45;"></div>
+      <p class="subtitle r" style="max-width:600px;">
+        Gracias por estar aquí hoy. Nos vemos dentro, caminando juntas estas 4 semanas.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /presentation -->
+
+<!-- ── FIXED UI ── -->
+<div id="logo"><img src="assets/icono.png" alt="MAD" /></div>
+<div id="counter"><span id="cur">1</span> / <span id="tot">1</span></div>
+<div id="progress"></div>
+<button class="nav" id="prev">‹</button>
+<button class="nav" id="next">›</button>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const TOTAL  = slides.length;
+  let cur = 0;
+  document.getElementById('tot').textContent = TOTAL;
+
+  /* build progress dots */
+  const prog = document.getElementById('progress');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.addEventListener('click', () => goTo(i));
+    prog.appendChild(d);
+  });
+
+  /* .r  = click-reveals */
+  function reveals(idx) {
+    return Array.from(slides[idx].querySelectorAll('.r'));
+  }
+  function shownCount(idx) {
+    return reveals(idx).filter(el => el.classList.contains('show')).length;
+  }
+  function showAll(idx) {
+    slides[idx].querySelectorAll('.r, .ra').forEach(el => el.classList.add('show'));
+  }
+  function hideAll(idx) {
+    slides[idx].querySelectorAll('.r, .ra').forEach(el => el.classList.remove('show'));
+  }
+
+  /* .ra = auto-reveal (title/label/divider) con stagger al activar slide.
+     Bloquea advance() mientras anima para que los bullets no salgan al mismo tiempo. */
+  let locked = false;
+
+  function autoReveal(idx) {
+    const raEls = Array.from(slides[idx].querySelectorAll('.ra'));
+    if (raEls.length === 0) return;
+    locked = true;
+    raEls.forEach((el, i) => {
+      setTimeout(() => el.classList.add('show'), 80 + i * 110);
+    });
+    const unlockAt = 80 + (raEls.length - 1) * 110 + 450;
+    setTimeout(() => { locked = false; }, unlockAt);
+  }
+
+  /* portada = static, show everything immediately */
+  const STATIC = [0];
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur = idx;
+    slides[cur].classList.add('active');
+    hideAll(cur);
+    if (STATIC.includes(cur)) {
+      showAll(cur);
+    } else {
+      autoReveal(cur);
+    }
+    updateUI();
+  }
+
+  function advance() {
+    if (locked) return;
+    const rv = reveals(cur);
+    const shown = shownCount(cur);
+    if (shown < rv.length) {
+      rv[shown].classList.add('show');
+    } else if (cur < TOTAL - 1) {
+      goTo(cur + 1);
+    }
+  }
+
+  function retreat() {
+    if (cur > 0) goTo(cur - 1);
+  }
+
+  function updateUI() {
+    document.getElementById('cur').textContent = cur + 1;
+    document.querySelectorAll('.dot').forEach((d, i) =>
+      d.classList.toggle('on', i === cur));
+  }
+
+  /* events */
+  document.addEventListener('click', e => {
+    if (e.target.closest('.nav') || e.target.closest('#progress')) return;
+    advance();
+  });
+  document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); retreat(); });
+  document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); advance(); });
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','Space','Enter'].includes(e.code)) { e.preventDefault(); advance(); }
+    if (e.code === 'ArrowLeft') retreat();
+    if (e.code === 'Home') goTo(0);
+    if (e.code === 'End') goTo(TOTAL - 1);
+  });
+
+  let tx = null;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) dx < 0 ? advance() : retreat();
+    else advance();
+    tx = null;
+  });
+
+  /* init */
+  updateUI();
+  if (STATIC.includes(0)) showAll(0);
+</script>
+</body>
+</html>
