@@ -245,6 +245,8 @@
     .checklist li::before { content: "☐"; color: var(--dorado); flex-shrink: 0; font-size: 1rem; line-height: 1.3; }
     .formula-box { margin-top: 2px; padding: 14px 18px; border-radius: 12px; background: rgba(212,184,126,0.08); border: 1px dashed rgba(212,184,126,0.4); font-family: 'Michelia', serif; font-size: clamp(0.88rem, 1.5vw, 1.02rem); line-height: 1.5; color: var(--blanco); text-align: center; }
     .formula-box em { color: var(--dorado-claro); font-style: normal; }
+    .formula-wrap { margin-top: 16px; width: 100%; max-width: 520px; }
+    .audit-cards .img-slot { flex: 1 1 260px; max-width: 300px; aspect-ratio: 4 / 5; }
 
     /* ══ SPEAKER NOTE — guion interno para presentadoras ══ */
     .speaker-note { margin-top: 14px; max-width: 820px; width: 100%; border: 1px dashed rgba(212,184,126,0.32); border-radius: 14px; padding: 12px 20px; background: rgba(255,255,255,0.015); text-align: left; }
@@ -515,26 +517,26 @@
       <h2 class="h-display h2 ra">Mini-Auditoría<br/><em>de Perfil Express</em></h2>
       <div class="divider ra"></div>
       <p class="subtitle white r" style="margin-bottom:12px;">Tu primer paso, hecho — no solo entendido.</p>
-      <div class="audit-cards r">
+      <div class="audit-cards">
         <div class="audit-card">
-          <div class="audit-card-tag">Checklist de 1 página</div>
+          <div class="audit-card-tag">Checklist</div>
           <div class="audit-card-title">El Filtro de 3 Segundos</div>
           <ul class="checklist">
-            <li>¿Tu foto muestra tu rostro y mirada abierta?</li>
-            <li>¿Tu nombre de usuario dice qué haces o solo tu nombre?</li>
-            <li>¿Tu biografía explica a quién ayudas sin usar palabras difíciles?</li>
-            <li>¿Tienes un enlace claro o la gente se pierde?</li>
+            <li class="r">¿Tu foto muestra tu rostro y mirada abierta?</li>
+            <li class="r">¿Tu nombre de usuario dice qué haces o solo tu nombre?</li>
+            <li class="r">¿Tu biografía explica a quién ayudas sin usar palabras difíciles?</li>
+            <li class="r">¿Tienes un enlace claro o la gente se pierde?</li>
           </ul>
         </div>
-        <div class="audit-card">
-          <div class="audit-card-tag">Fórmula de una línea</div>
-          <div class="audit-card-title">Plantilla de 1 Bio Lista</div>
-          <div class="formula-box">"Ayudo a <em>[público]</em> a <em>[resultado]</em> a través de <em>[tu herramienta/medicina]</em>."</div>
+        <div class="img-slot r">
+          <div class="slot-icon">🖼️</div>
+          <div class="slot-text">Ejemplo de perfil</div>
         </div>
       </div>
-      <div class="speaker-note r">
-        <div class="speaker-note-tag">🎤 Guion sugerido — transición a la venta</div>
-        <p>"Hoy se llevan esta Mini-Auditoría Express para que arreglen su perfil en 10 minutos y no les dé pena que la gente las visite hoy mismo. Pero arreglar la fachada es solo el primer paso. En la Semana 1 del curso vamos a construir su Tablero de Claridad completo: no solo cómo se ve tu perfil, sino la arquitectura de tu mensaje, tus 3 pilares de comunicación y la regulación de tu cuerpo para sostener esa presencia en el tiempo."</p>
+      <div class="formula-wrap r">
+        <div class="audit-card-tag" style="text-align:center;">Fórmula de una línea</div>
+        <div class="audit-card-title" style="text-align:center;">Plantilla de 1 Bio Lista</div>
+        <div class="formula-box">"Ayudo a <em>[público]</em> a <em>[resultado]</em> a través de <em>[tu herramienta/medicina]</em>."</div>
       </div>
     </div>
   </div>
