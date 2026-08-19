@@ -238,6 +238,11 @@
     /* ══ LOGO / GRÁFICO TRANSPARENTE (sin marco) ══ */
     .logo-graphic { flex: 1 1 320px; max-width: 380px; display: flex; align-items: center; justify-content: center; }
     .logo-graphic img { width: 100%; height: auto; display: block; }
+
+    /* ══ QR DE CHECKOUT ══ */
+    .qr-card { margin: 22px auto 0; display: inline-flex; flex-direction: column; align-items: center; gap: 10px; background: #fff; border-radius: 16px; padding: 16px 18px; }
+    .qr-card img { width: 130px; height: 130px; display: block; }
+    .qr-caption { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--azul-dark); }
     .img-slot .slot-icon { font-size: 1.6rem; opacity: 0.5; }
     .img-slot .slot-text { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; text-align: center; padding: 0 14px; }
 
@@ -740,6 +745,10 @@
       <div class="price-wrap r">
         <div class="price-num" style="font-size:clamp(2.2rem,5vw,3.4rem);">148 USD</div>
         <div class="price-sub">+ 2 Bonos, solo hoy</div>
+      </div>
+      <div class="qr-card r">
+        <img src="imagenes/qr-checkout.png" alt="Código QR para inscribirte" />
+        <div class="qr-caption">Escanea para inscribirte</div>
       </div>
     </div>
   </div>
